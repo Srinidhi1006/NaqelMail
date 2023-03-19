@@ -19,7 +19,6 @@
 ]</format>
                 <args/>
             </payloadFactory>
-            <log level="full" separator=" **********"/>
             <foreach expression="json-eval($)" id="naqelID">
                 <sequence>
                     <log level="full" separator="  InsideLog  "/>
