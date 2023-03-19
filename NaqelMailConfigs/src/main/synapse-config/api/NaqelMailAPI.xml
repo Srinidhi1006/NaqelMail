@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<api context="/naqel_mail" name="NaqelMailAPI" xmlns="http://ws.apache.org/ns/synapse">
+    <resource methods="GET">
+        <inSequence>
+            <payloadFactory media-type="json">
+                <format>[&#xd;
+    {&#xd;
+        "bag_id": 23788098,&#xd;
+        "message": "No route_id as 2854"&#xd;
+    },&#xd;
+    {&#xd;
+        "bag_id": 23788095,&#xd;
+        "message": "No route_id as None"&#xd;
+    },&#xd;
+    {&#xd;
+        "bag_id": 23787030,&#xd;
+        "message": "updated"&#xd;
+    }&#xd;
+]</format>
+                <args/>
+            </payloadFactory>
+            <foreach expression="json-eval($)" id="naqelID">
+                <sequence>
+                    <log level="full" separator="  InsideLog  "/>
+                </sequence>
+            </foreach>
+            <log level="full" separator="  --AfterForEach--  ">
+                <property expression="$ctx:path" name="path"/>
+            </log>
+            <!-- <iterate expression="json-eval($)" id="naqelITID">
+                <target>
+                    <sequence>
+                        <log level="full" separator="  InsideLog  "/>
+                        <filter regex="updated" source="json-eval($.message)">
+                            <then>
+                                <log level="full" separator="  ThenLog  "/>
+                            </then>
+                            <else>
+                                <log level="full" separator="  ElseLog  "/>
+                                <property expression="json-eval($)" name="path" scope="default" type="STRING"/>
+                                <log level="custom" separator="  AfterPrty  ">
+                                    <property expression="$ctx:path" name="path"/>
+                                    <property expression="json-eval($)" name="path11"/>
+                                </log>
+                            </else>
+                        </filter>
+                    </sequence>
+                </target>
+            </iterate> -->
+            <aggregate id="naqelAgID">
+                <completeCondition>
+                    <messageCount max="-1" min="-1"/>
+                </completeCondition>
+                <onComplete aggregateElementType="root" expression="$ctx:path">
+                    <log level="full" separator="  --InsideAggregate--  "/>
+                </onComplete>
+            </aggregate>
+            <respond/>
+        </inSequence>
+        <outSequence/>
+        <faultSequence/>
+    </resource>
+    <resource methods="POST" uri-template="/newNaqel">
+        <inSequence>
+            <script language="js"><![CDATA[var log = mc.getServiceLog();
+var payload = mc.getPayloadJSON();
+function constructErrorData(payload) {
+     var data=[];
+for (i = 0; i < payload.length; i++) {
+    var val = payload[i];
+  if(val.message != "updated" && val.message != "created"){
+     data.push(val);
+  }
+} return data;
+    };
+log.info("ErrorData="+constructErrorData(payload));
+mc.setPayloadJSON(constructErrorData(payload));]]></script>
+            <log level="full" separator="88888888888  "/>
+            <respond/>
+        </inSequence>
+        <outSequence/>
+        <faultSequence/>
+    </resource>
+</api>
